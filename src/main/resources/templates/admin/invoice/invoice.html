@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
+<head th:replace="fragments/headTag :: headTag">
+</head>
+
+<body>
+
+<header th:replace="fragments/header :: header">
+</header>
+
+<div class="container">
+
+    <h1>Invoice</h1>
+
+    <div class="row">
+        <div class="col-sm-3">Invoice ID:</div>
+        <div class="col-sm-9" th:text="${invoice.id}"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Status:</div>
+        <div class="col-sm-9" th:text="${invoice.status}"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Created:</div>
+        <div class="col-sm-9">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Updated:</div>
+        <div class="col-sm-9">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Total items:</div>
+        <div class="col-sm-9" th:text="${cart.totalCount}">${requestScope.cart.totalCount}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Total price:</div>
+        <div class="col-sm-9" th:text="${cart.totalCost}">
+
+        </div>
+    </div>
+
+    <h3>User info</h3>
+
+    <div class="row">
+        <div class="col-sm-3">User ID:</div>
+        <div class="col-sm-9" th:text="${user.id}">${requestScope.user.id}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Name:</div>
+        <div class="col-sm-9" th:text="${user.firstName + ' ' + user.lastName}"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">Email:</div>
+        <div class="col-sm-9" th:text="${user.email}"></div>
+    </div>
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Periodical Id</th>
+            <th>Periodical Name</th>
+            <th>Price per month</th>
+        </tr>
+        </thead>
+
+        <tr th:each="periodical : ${cart.cartItems}">
+            <td th:text="${periodical.id}"></td>
+            <td th:text="${periodical.name}"></td>
+            <td th:text="'$' + ${periodical.monthlyPrice}">
+
+            </td>
+        </tr>
+
+    </table>
+
+    <div class="row" th:if="${invoice.status.toString().equals('IN_PROGRESS')}">
+
+        <form class="mr-auto" th:action="@{/admin/invoices/view}" method="post">
+            <input type="hidden" name="command" value="cancel">
+            <input type="hidden" name="id" th:value="${invoice.id}">
+            <input type="submit" class="btn btn-outline-danger" value="Cancel">
+        </form>
+
+        <form class="ml-auto" th:action="@{/admin/invoices/view}" method="post">
+
+            <input type="hidden" name="command" value="approve">
+            <input type="hidden" name="id" th:value="${invoice.id}">
+            <input type="submit" class="btn btn-outline-info" value="Approve">
+        </form>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

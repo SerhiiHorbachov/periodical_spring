@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
+<head th:replace="fragments/headTag :: headTag">
+</head>
+
+<body>
+
+<header th:replace="fragments/header :: header">
+</header>
+
+<div class="container">
+    <h1>Invoices</h1>
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>InvoiceId</th>
+            <th>UserId</th>
+            <th>Status</th>
+            <th>CreatedAt</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+
+
+        <tr th:each="invoice : ${invoices}">
+            <td th:text="${invoice.id}"></td>
+            <td th:text="${invoice.userId}"></td>
+            <td th:text="${invoice.status}"></td>
+            <td></td>
+            <td>
+                <a th:href="@{/admin/invoices/view(id=${invoice.id})}" class="btn btn-primary">Process</a>
+
+<!--                <c:url value="/admin/invoices/view" var="url">-->
+<!--                    <c:param name="id" value="${invoice.id}"/>-->
+<!--                </c:url>-->
+<!--                <a href="${url}" class="btn btn-outline-info">Process</a>-->
+<!--                <%&#45;&#45; <a href="<c:url value="/admin/invoices/process?id=${invoice.id}"/>"&#45;&#45;%>-->
+<!--                <%&#45;&#45; class="btn btn-outline-info">Process</a>&#45;&#45;%>-->
+            </td>
+
+        </tr>
+
+
+    </table>
+
+</div>
+</body>
+</html>
