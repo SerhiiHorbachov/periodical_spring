@@ -14,28 +14,30 @@
 
     <div th:if="${param.error}">
         <div class="alert alert-danger">
-            
-            <span th:text="${'email or password is invalid'}"></span>
+
+            <span th:text="#{error.login}">Email or password is invalid</span>
         </div>
     </div>
 
     <form action="login" method="POST">
         <table>
             <tr>
-                <td>User:</td>
+                <td th:text="#{label.email}">Email:</td>
                 <td><input type="text" name="username" value=""/></td>
             </tr>
             <tr>
-                <td>Password:</td>
+                <td th:text="#{label.password}">Password:</td>
                 <td><input type="password" name="password"/></td>
             </tr>
             <tr>
-                <td><input type="submit" value="submit"></td>
+                <td>
+                    <button type="submit" class="btn btn-success" th:text="#{label.login}"></button>
+                </td>
             </tr>
         </table>
     </form>
 
-    <a th:href="@{/register}">Register</a>
+    <a th:href="@{/register}" th:text="#{label.register}">Register</a>
 
 </div>
 

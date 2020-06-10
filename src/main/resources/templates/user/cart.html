@@ -11,8 +11,7 @@
 </header>
 
 <div class="container">
-    <h1>Cart</h1>
-
+    <h1 th:text="#{header.cart}">Cart</h1>
 
     <div class="container my-2">
 
@@ -24,10 +23,10 @@
                 <div th:if="${cart != null}">
 
                     <div>
-                        Total items: <span th:text="${cart.totalCount}"></span>
+                        <span th:text="#{label.total_items} + ':'">Total items:</span> <span th:text="${cart.totalCount}"></span>
                     </div>
                     <div>
-                        Total cost: USD<span th:text="${cart.totalCost/100}"></span>
+                        <span th:text="#{label.total_cost} + ': $ '">Total cost: $</span><span th:text="${cart.totalCost/100 + '.'+ cart.totalCost % 100}"></span>
                     </div>
 
                     <th:block th:each="periodical : ${cart.cartItems}">
@@ -39,7 +38,7 @@
                                     <h5 class="card-title"><h2 th:text="${periodical.name}"></h2>
                                     </h5>
                                     <div class="price">
-                                        Price: USD<span th:text="${cart.totalCost/100}"></span>
+                                     <span th:text="#{label.price} + ': $'">Price: $</span>   <span th:text="${cart.totalCost/100 + '.' + cart.totalCost % 100}"></span>
 
                                     </div>
                                     <p class="card-text" th:text="${periodical.description}"></p>
@@ -48,9 +47,7 @@
                                         <input type="hidden" name="periodicalId"
                                                th:value="${periodical.id}">
                                         <div class="text-right">
-                                            <input type="submit"
-                                                   class="btn btn-outline-danger ml-auto"
-                                                   value="Remove"/>
+                                            <button type="submit" class="btn btn-outline-danger ml-auto" th:text="#{label.remove}"></button>
                                         </div>
                                     </form>
 
@@ -64,8 +61,7 @@
                     <div>
                         <form th:action="@{/my/cart/submit}" method="POST">
                             <div class="text-center">
-                                <input type="submit" class="btn btn-success ml-auto"
-                                       value="Submit invoice"/>
+                                <button type="submit" class="btn btn-success ml-auto" th:text="#{label.submit_invoice}">Submit invoice</button>
                             </div>
                         </form>
                     </div>

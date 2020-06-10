@@ -31,7 +31,6 @@ public class UserService {
     @Autowired
     private UserPeriodicalsRepository userPeriodicalsRepository;
 
-
     public List<User> getAllUsers() {
         List<User> users = userRepository.findAll();
         if (users.size() > 0) {
