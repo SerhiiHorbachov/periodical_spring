@@ -46,17 +46,6 @@ public class HibernateConfig {
         dataSource.setUrl("jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1");
         dataSource.setUsername("sa");
         dataSource.setPassword("sa");
-//        try {
-//            Statement st = dataSource.getConnection().createStatement();
-//            st.execute("drop all objects delete files");
-//            st.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-
-//        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-//        resourceDatabasePopulator.addScripts(new ClassPathResource("schema.sql"));
-//        DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
         return dataSource;
     }
