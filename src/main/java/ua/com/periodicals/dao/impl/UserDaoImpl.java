@@ -13,7 +13,6 @@ import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.entity.User;
 import ua.com.periodicals.exception.DaoException;
 import ua.com.periodicals.exception.NotFoundException;
-import ua.com.periodicals.service.UserService;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;

@@ -114,6 +114,5 @@ class UserDaoImplTest {
         assertEquals(expectedUserId, userToStore.getId());
 
     }
-
-
+    
 }

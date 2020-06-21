@@ -23,9 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PeriodicalDaoImplTest {
 
     private static ApplicationContext applicationContext;
-
     private static PeriodicalDaoImpl periodicalDao;
-
 
     @BeforeAll
     public static void setUp() {
