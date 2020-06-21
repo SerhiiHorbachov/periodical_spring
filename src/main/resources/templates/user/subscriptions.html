@@ -35,7 +35,9 @@
 
                                     <form th:action="@{/main/subscriptions}" method="POST">
                                         <input type="hidden" name="id" th:value="${periodical.id}">
-                                        <button type="submit" class="btn btn-outline-danger" th:text="#{label.unsubscribe}">Unsubscribe</button>
+                                        <button type="submit" class="btn btn-outline-danger"
+                                                th:text="#{label.unsubscribe}">Unsubscribe
+                                        </button>
                                     </form>
 
                                 </td>

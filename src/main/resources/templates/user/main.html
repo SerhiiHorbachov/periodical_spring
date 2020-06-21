@@ -17,7 +17,8 @@
                 <div class="col-md-10">
                     <h2 th:case="null">No record found !!</h2>
                     <div th:case="*">
-                        <div class="alert alert-warning" th:if="${alreadySubscribed}"><span th:text="#{msg.already_subscribe}">Already subscribed</span></div>
+                        <div class="alert alert-warning" th:if="${alreadySubscribed}"><span
+                                th:text="#{msg.already_subscribe}">Already subscribed</span></div>
                         <table class="table table-striped table-responsive-md">
                             <thead>
                             <tr>
@@ -36,7 +37,9 @@
                                 <td>
                                     <form th:action="@{/main}" method="POST">
                                         <input type="hidden" name="id" th:value="${periodical.id}">
-                                        <button type="submit" class="btn btn-success" th:text="#{label.subscribe}">Subscribe</button>
+                                        <button type="submit" class="btn btn-success"
+                                                th:text="#{label.subscribe}">Subscribe
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -47,7 +50,48 @@
                 </div>
             </div>
         </div>
+
+        <div>
+            <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+
+                    <li class="page-item" th:if="${currentPage} != 1">
+                        <a class="page-link"
+                           th:href="@{main(page=${1})}" th:text="#{label.first}">First</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage} != 1">
+                        <a class="page-link"
+                           th:href="@{/main(page=${currentPage - 1})}" th:text="#{label.prev}">Prev</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage} <= 3"
+                        th:each="index : ${#numbers.sequence(1, totalPages > 3 ? 3 : totalPages)}">
+                        <a class="page-link" th:href="@{/main(page=${index})}"
+                           th:text="${index}">1</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage} > 3"
+                        th:each="index : ${#numbers.sequence(currentPage - 1, currentPage == totalPages ? totalPages : (currentPage + 1))}">
+                        <a class="page-link" th:href="@{main(page=${index})}"
+                           th:text="${index}">1</a>
+                    </li>
+
+                    <li class="page-item" th:if="${currentPage} != ${totalPages}">
+                        <a class="page-link"
+                           th:href="@{main(page=${currentPage + 1})}" th:text="#{label.next}">Next</a>
+                    </li>
+                    <li class="page-item" th:if="${currentPage} != ${totalPages}">
+                        <a class="page-link"
+                           th:href="@{main(page=${totalPages})}" th:text="#{label.last}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+
     </div>
+
 </div>
 </body>
 </html>

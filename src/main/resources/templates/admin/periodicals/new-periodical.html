@@ -11,32 +11,32 @@
 </header>
 
 <div class="container">
-    <h3>Edit Periodical</h3>
+    <h3>Add Periodical</h3>
     <hr>
+    <a th:href="@{/admin/periodicals}">Back to List</a>
 
-    <form th:action="@{/admin/periodicals/edit}" method="POST" th:object="${periodical}"
-          class="needs-validation" novalidate>
-        <input type="hidden" name="id" th:value="${periodical.id}">
+    <form action="/admin/periodicals/new" method="POST" class="needs-validation" novalidate th:object="${periodical}">
+
         <div class="form-group">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" class="form-control"
-                   th:attr="value=${periodical.name}" required>
+            <input type="text" id="name" name="name" class="form-control" th:attr="value=${periodical.name}">
             <p class="text-danger" th:each="error: ${#fields.errors('name')}"
-               th:text="${error}">Validation error</p>
+               th:text="${error}" th:utext="#{msg.should_not_be_empty}">Validation error</p>
         </div>
 
         <div class="form-group">
             <label for="monthlyPrice">Price, USD:</label>
-            <input type="number" min="0.00" max="10000.00" step="0.01" id="monthlyPrice" name="monthlyPrice"
-                   class="form-control" th:attr="value=${periodical.monthlyPrice}" required>
+
+            <input type="number" min="0.00" step="0.01" id="monthlyPrice" name="monthlyPrice"
+                   placeholder="9.99" class="form-control"  th:attr="value=${periodical.monthlyPrice}" >
             <p class="text-danger" th:each="error: ${#fields.errors('monthlyPrice')}"
-               th:text="${error}">Validation error</p>
+               th:text="${error}" th:utext="#{msg.should_not_be_empty}">Validation error</p>
         </div>
 
         <div class="form-group">
             <label for="description">Description:</label>
-            <input type="text" id="description" name="description"
-                   th:attr="value=${periodical.description}" class="form-control">
+            <input type="text" id="description" name="description" class="form-control">
+
         </div>
 
         <div class="text-right">
@@ -44,7 +44,6 @@
         </div>
 
     </form>
-
 
 </div>
 

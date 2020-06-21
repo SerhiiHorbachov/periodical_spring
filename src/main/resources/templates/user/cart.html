@@ -23,10 +23,12 @@
                 <div th:if="${cart != null}">
 
                     <div>
-                        <span th:text="#{label.total_items} + ':'">Total items:</span> <span th:text="${cart.totalCount}"></span>
+                        <span th:text="#{label.total_items} + ':'">Total items:</span> <span
+                            th:text="${cart.totalCount}"></span>
                     </div>
                     <div>
-                        <span th:text="#{label.total_cost} + ': $ '">Total cost: $</span><span th:text="${cart.totalCost/100 + '.'+ cart.totalCost % 100}"></span>
+                        <span th:text="#{label.total_cost} + ': $ '">Total cost: $</span><span
+                            th:text="${cart.totalCost/100 + '.'+ cart.totalCost % 100}"></span>
                     </div>
 
                     <th:block th:each="periodical : ${cart.cartItems}">
@@ -38,7 +40,8 @@
                                     <h5 class="card-title"><h2 th:text="${periodical.name}"></h2>
                                     </h5>
                                     <div class="price">
-                                     <span th:text="#{label.price} + ': $'">Price: $</span>   <span th:text="${cart.totalCost/100 + '.' + cart.totalCost % 100}"></span>
+                                        <span th:text="#{label.price} + ': $'">Price: $</span> <span
+                                            th:text="${cart.totalCost/100 + '.' + cart.totalCost % 100}"></span>
 
                                     </div>
                                     <p class="card-text" th:text="${periodical.description}"></p>
@@ -47,7 +50,9 @@
                                         <input type="hidden" name="periodicalId"
                                                th:value="${periodical.id}">
                                         <div class="text-right">
-                                            <button type="submit" class="btn btn-outline-danger ml-auto" th:text="#{label.remove}"></button>
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger ml-auto"
+                                                    th:text="#{label.remove}"></button>
                                         </div>
                                     </form>
 
@@ -61,7 +66,9 @@
                     <div>
                         <form th:action="@{/my/cart/submit}" method="POST">
                             <div class="text-center">
-                                <button type="submit" class="btn btn-success ml-auto" th:text="#{label.submit_invoice}">Submit invoice</button>
+                                <button type="submit" class="btn btn-success ml-auto"
+                                        th:text="#{label.submit_invoice}">Submit invoice
+                                </button>
                             </div>
                         </form>
                     </div>

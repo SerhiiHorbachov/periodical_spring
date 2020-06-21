@@ -1,8 +1,9 @@
 package ua.com.periodicals.controller;
 
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,15 +19,14 @@ import ua.com.periodicals.service.InvoiceService;
 import ua.com.periodicals.service.PeriodicalService;
 import ua.com.periodicals.service.UserService;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @SessionAttributes("cart")
 @Controller
 public class UserController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     UserService userService;
@@ -37,20 +37,30 @@ public class UserController {
     @Autowired
     InvoiceService invoiceService;
 
-    @RequestMapping("/")
+    @Autowired
+    Environment env;
+
+    @GetMapping("/")
     public String getWelcome(Model model) {
 
         return "user/main";
     }
 
-    @RequestMapping("/main")
-    public ModelAndView getAllPeriodicals(Model model) {
-        LOG.debug("Try to show list-periodicals view");
+    @GetMapping("/main")
+    public ModelAndView getPeriodicalsPerPage(@RequestParam("page") Optional<String> page) {
+        LOG.debug("Try to show list-periodicals view, page={}", page.orElse(null));
+
+        int currentPage = page.isPresent() ? Integer.parseInt(page.get()) : 1;
+        int itemsPerPage = Integer.parseInt(env.getProperty("admin_periodicals_per_page"));
+        List<Periodical> periodicals = periodicalService.getPeriodicalsPage(currentPage, itemsPerPage);
+        int totalPages = (int) Math.ceil((periodicalService.getCount() / itemsPerPage));
 
         ModelAndView mav = new ModelAndView("user/main");
-        List<Periodical> periodicals = periodicalService.getAllPeriodicals();
 
         mav.addObject("periodicals", periodicals);
+        mav.addObject("currentPage", currentPage);
+        mav.addObject("totalPages", totalPages);
+
         return mav;
     }
 
@@ -59,22 +69,20 @@ public class UserController {
         LOG.debug("Try to add periodical to cart, id={}", id);
 
         ModelAndView mav = new ModelAndView();
-
         Periodical periodical = periodicalService.getById(Long.parseLong(id));
-        LOG.info("Periodical: {}", periodical);
-
         User loggedUser = userService.getLoggedUser();
-        LOG.info("Logged user: {}", loggedUser);
 
-        if (userService.isUserSubscribedToPeriodical(loggedUser.getId(), periodical.getId())) {
+        if (userService.isUserSubscribedToPeriodical(loggedUser.getId(), periodical.getId())
+            || userService.isPeriodicalInUnpaidInvoice(loggedUser.getId(), periodical.getId())
+        ) {
             mav.setViewName("user/main");
             mav.addObject("alreadySubscribed", "Already Subscribed");
 
             List<Periodical> periodicals = periodicalService.getAllPeriodicals();
             mav.addObject("periodicals", periodicals);
 
-            return mav;
         } else {
+
             Cart cart = (Cart) model.getAttribute("cart");
             LOG.debug("Got cart from session scope: {}", cart);
 
@@ -86,8 +94,9 @@ public class UserController {
             model.addAttribute("cart", cart);
 
             mav.setViewName("redirect:/main/cart");
-            return mav;
         }
+
+        return mav;
     }
 
     @PostMapping("/main/cart/remove")
@@ -137,23 +146,16 @@ public class UserController {
         LOG.debug("Try to show active subscriptions");
 
         ModelAndView modelAndView = new ModelAndView("user/subscriptions");
-
-        Set<Periodical> subscriptions = userService.getActiveSubscriptions();
-        LOG.info("Active subscriptions: {}", subscriptions);
-
-        modelAndView.addObject("subscriptions", subscriptions);
+        modelAndView.addObject("subscriptions", userService.getLoggedUser().getSubscriptions());
 
         return modelAndView;
     }
-
 
     @PostMapping("/main/subscriptions")
     public String unsubscribe(@RequestParam("id") String periodicalId) {
         LOG.debug("Try to remove from subscriptions, periodicalId={}", periodicalId);
 
-        User user = userService.getLoggedUser();
-        userService.unsubscribe(user.getId(), Long.parseLong(periodicalId));
-//        ModelAndView mav = new ModelAndView();
+        userService.unsubscribe(Long.parseLong(periodicalId));
         return "redirect:/main/subscriptions";
     }
 

@@ -1,6 +1,7 @@
 package ua.com.periodicals.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,13 +29,15 @@ public class User {
     @Column(name = "password_hash")
     private String pwd;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER,
+        cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
     @JoinTable(
         name = "users_periodicals",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "periodical_id")
     )
-    Set<Periodical> subscriptions;
+    Set<Periodical> subscriptions = new HashSet<>();
 
     public User() {
 
@@ -107,6 +110,10 @@ public class User {
 
     public Set<Periodical> getSubscriptions() {
         return subscriptions;
+    }
+
+    public void setSubscriptions(Set<Periodical> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 
     @Override

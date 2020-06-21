@@ -13,6 +13,7 @@
 <div class="container">
 
     <h1>Invoice</h1>
+    <hr>
 
     <div class="row">
         <div class="col-sm-3">Invoice ID:</div>
@@ -26,35 +27,37 @@
 
     <div class="row">
         <div class="col-sm-3">Created:</div>
-        <div class="col-sm-9">
+        <div class="col-sm-9" th:text="${invoice.createdAt}">
 
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-3">Updated:</div>
-        <div class="col-sm-9">
+        <div class="col-sm-9" th:text="${invoice.updatedAt}">
 
         </div>
     </div>
 
     <div class="row">
         <div class="col-sm-3">Total items:</div>
-        <div class="col-sm-9" th:text="${cart.totalCount}">${requestScope.cart.totalCount}</div>
+        <div class="col-sm-9" th:text="${cart.totalCount }"></div>
     </div>
 
     <div class="row">
         <div class="col-sm-3">Total price:</div>
-        <div class="col-sm-9" th:text="${cart.totalCost}">
+        <div class="col-sm-9"
+             th:text="'$' + ${#numbers.formatDecimal(1.0 * cart.totalCost / 100, 1, 2)}">
 
         </div>
     </div>
 
+    <br>
     <h3>User info</h3>
 
     <div class="row">
         <div class="col-sm-3">User ID:</div>
-        <div class="col-sm-9" th:text="${user.id}">${requestScope.user.id}</div>
+        <div class="col-sm-9" th:text="${user.id}">${user.id}</div>
     </div>
 
     <div class="row">
@@ -79,7 +82,7 @@
         <tr th:each="periodical : ${cart.cartItems}">
             <td th:text="${periodical.id}"></td>
             <td th:text="${periodical.name}"></td>
-            <td th:text="'$' + ${periodical.monthlyPrice}">
+            <td th:text="'$' + ${#numbers.formatDecimal(1.0 * periodical.monthlyPrice / 100, 1, 2)}">
 
             </td>
         </tr>
@@ -102,7 +105,6 @@
         </form>
 
     </div>
-
 
 </div>
 

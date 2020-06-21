@@ -1,6 +1,6 @@
 package ua.com.periodicals.controller;
 
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @Controller
 public class SecurityController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityController.class);
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(SecurityController.class);
 
     private User user;
 
@@ -47,6 +47,7 @@ public class SecurityController {
         return "register";
     }
 
+
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") @Valid UserDto user,
                                BindingResult bindingResult, Model model) {
@@ -67,6 +68,5 @@ public class SecurityController {
 
         return "register-success";
     }
-
 
 }

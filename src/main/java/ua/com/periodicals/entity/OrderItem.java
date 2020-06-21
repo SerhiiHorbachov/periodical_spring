@@ -8,12 +8,13 @@ public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="order_item_id")
     private long id;
 
     @Column(name = "invoice_id")
     private long invoiceId;
 
-    @Column(name = "periodicals_id")
+    @Column(name = "periodical_id")
     private long periodicalId;
 
     @Column(name = "price_per_month")
@@ -23,11 +24,16 @@ public class OrderItem {
 ////    @JoinColumn(name = "periodicals_id");
 //    private Periodical periodical;
 
-//    @ManyToOne
-//    @JoinColumn(name = "invoice_id", nullable = false)
-//    private Invoice invoice;
+    @ManyToOne
+    @JoinColumn(name = "invoice_id", insertable = false, updatable = false)
+    private Invoice invoice;
 
     public OrderItem() {
+    }
+
+    public OrderItem(long periodicalId, long costPerMonth) {
+        this.periodicalId = periodicalId;
+        this.costPerMonth = costPerMonth;
     }
 
     public OrderItem(long invoiceId, long periodicalId, long costPerMonth) {
@@ -35,7 +41,6 @@ public class OrderItem {
         this.periodicalId = periodicalId;
         this.costPerMonth = costPerMonth;
     }
-
 
     public long getId() {
         return id;
@@ -77,6 +82,14 @@ public class OrderItem {
 //        this.periodical = periodical;
 //    }
 
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
+    }
 
     @Override
     public String toString() {

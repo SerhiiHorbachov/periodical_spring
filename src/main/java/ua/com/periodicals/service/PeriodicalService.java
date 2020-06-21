@@ -5,13 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.periodicals.dao.PeriodicalDao;
 import ua.com.periodicals.entity.Periodical;
-import ua.com.periodicals.repository.PeriodicalRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -20,10 +19,10 @@ public class PeriodicalService {
     private static final Logger LOG = LoggerFactory.getLogger(PeriodicalService.class);
 
     @Autowired
-    PeriodicalRepository periodicalRepository;
+    PeriodicalDao periodicalDao;
 
     public List<Periodical> getAllPeriodicals() {
-        List<Periodical> periodicals = periodicalRepository.findAll();
+        List<Periodical> periodicals = periodicalDao.findAll();
         if (periodicals.size() > 0) {
             return periodicals;
         } else {
@@ -31,27 +30,49 @@ public class PeriodicalService {
         }
     }
 
-    @Transactional
+    public long getCount() {
+        return periodicalDao.getCount();
+    }
+
+    public List<Periodical> getPeriodicalsPage(int page, int maxItems) {
+        int firstResult = page == 1 ? 0 : ((page - 1) * maxItems);
+        return periodicalDao.findPerPage(firstResult, maxItems);
+    }
+
     public Periodical save(Periodical periodical) {
-        return periodicalRepository.save(periodical);
+        LOG.debug("Try to save new periodical: {}", periodical);
+        return periodicalDao.save(periodical);
+    }
+
+    public Periodical update(Periodical periodical) {
+        LOG.debug("Try to update new periodical: {}", periodical);
+        return periodicalDao.update(periodical);
     }
 
     public Periodical getById(long id) {
         LOG.debug("Try to get periodical by id={}", id);
-        Optional<Periodical> periodical = periodicalRepository.findById(id);
-
-        if (!periodical.isPresent()) {
-            LOG.info("Periodical id={} not found");
-            throw new NoSuchElementException(String.format("Periodical id= %d not found", id));
-        }
-
-        return periodical.get();
+        return periodicalDao.getById(id);
     }
 
-    @Transactional
     public void deleteById(long periodicalId) {
         LOG.debug("Try to delete periodical, id={}", periodicalId);
-        periodicalRepository.deleteById(periodicalId);
+
+        //check periodical in order_items
+        // check periodicals is in users_periodicals;
+
+
+        periodicalDao.deleteById(periodicalId);
     }
+
+    public List<Periodical> findAllByInvoiceId(long invoiceId) {
+        LOG.debug("Try to get all periodicals by invoice id={}", invoiceId);
+        return periodicalDao.findAllByInvoiceId(invoiceId);
+    }
+
+
+    private void checkPeriodicalIsUsed(long id) {
+
+    }
+
 
 }

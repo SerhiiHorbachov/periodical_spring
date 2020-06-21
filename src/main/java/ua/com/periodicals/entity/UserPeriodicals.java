@@ -2,18 +2,18 @@ package ua.com.periodicals.entity;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "users_periodicals")
+//@Entity
+//@Table(name = "users_periodicals")
 public class UserPeriodicals {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    @Column(name = "user_id")
+//    @Column(name = "user_id")
     private long userId;
 
-    @Column(name = "periodical_id")
+//    @Column(name = "periodical_id")
     private long periodicalId;
 
     public UserPeriodicals() {

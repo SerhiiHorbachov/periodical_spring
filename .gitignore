@@ -1,6 +1,8 @@
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+.mvn
+mvnw
+.gitignore
 !**/src/main/**
 !**/src/test/**
 
@@ -21,13 +23,7 @@ target/
 logs/
 *.cmd
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
+
 
 ### VS Code ###
 .vscode/

@@ -18,7 +18,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return Collections.singleton(new SimpleGrantedAuthority("user"));
         return Collections.singleton(new SimpleGrantedAuthority(user.getRole().toString()));
     }
 
@@ -52,7 +51,7 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public long getId(){
+    public long getId() {
         return user.getId();
     }
 }

@@ -42,6 +42,13 @@ CREATE TABLE users_periodicals
 );
 
 
+INSERT INTO users(user_id, first_name, last_name, role, email, password_hash)
+VALUES (DEFAULT, 'Jack', 'Nicholson', 'ADMIN', 'jack.nich@gmai.com', '1'),
+       (DEFAULT, 'Marlon', 'Brando', 'USER', 'marl.brand@gmai.com', '2'),
+       (DEFAULT, 'Robert', 'DeNiro', 'USER', 'rob.niro@gmai.com', '3'),
+       (DEFAULT, 'Dustin', 'Hoffman', 'USER', 'dust.hoff@gmai.com', '4'),
+       (DEFAULT, 'Al', 'Pacino', 'ADMIN', 'al.pach@gmai.com', '5');
+
 INSERT INTO invoices(user_id, status)
 VALUES (4, 'IN_PROGRESS'),
        (4, 'IN_PROGRESS'),

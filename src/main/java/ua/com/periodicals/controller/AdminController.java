@@ -1,17 +1,18 @@
 package ua.com.periodicals.controller;
 
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ua.com.periodicals.dto.PeriodicalDto;
-import ua.com.periodicals.dto.UserDto;
 import ua.com.periodicals.entity.Invoice;
-import ua.com.periodicals.entity.OrderItem;
 import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.entity.User;
 import ua.com.periodicals.model.Cart;
@@ -21,12 +22,13 @@ import ua.com.periodicals.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Controller
 public class AdminController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
+    @Autowired
+    Environment env;
 
     @Autowired
     PeriodicalService periodicalService;
@@ -37,51 +39,76 @@ public class AdminController {
     @Autowired
     UserService userService;
 
-    @RequestMapping("/admin/periodicals")
-    public ModelAndView getAllPeriodicals(Model model) {
-        LOG.debug("Try to show list-periodicals view");
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(AdminController.class);
 
-        ModelAndView mav = new ModelAndView("admin/list-periodicals");
-        List<Periodical> periodicals = periodicalService.getAllPeriodicals();
+    @GetMapping("/admin/periodicals")
+    public ModelAndView getPeriodicalsPerPage(@RequestParam("page") Optional<String> page) {
+        LOG.debug("Try to show list-periodicals view, page={}", page.orElse(null));
 
+        int currentPage = page.isPresent() ? Integer.parseInt(page.get()) : 1;
+        int itemsPerPage = Integer.parseInt(env.getProperty("admin_periodicals_per_page"));
+        List<Periodical> periodicals = periodicalService.getPeriodicalsPage(currentPage, itemsPerPage);
+        int totalPages = (int) Math.ceil((periodicalService.getCount() / itemsPerPage));
+
+        if (Double.valueOf(periodicalService.getCount()) % itemsPerPage != 0) {
+            totalPages = totalPages + 1;
+        }
+
+        ModelAndView mav = new ModelAndView("admin/periodicals/list-periodicals");
         mav.addObject("periodicals", periodicals);
+        mav.addObject("currentPage", currentPage);
+        mav.addObject("totalPages", totalPages);
+
         return mav;
     }
 
-    @RequestMapping("/admin/periodicals/new")
+    @GetMapping("/admin/periodicals/new")
     public ModelAndView showNewPeriodicalForm() {
         LOG.debug("Try to show add periodical form");
 
-        ModelAndView mav = new ModelAndView("admin/add-periodical");
+        PeriodicalDto periodicalDto = new PeriodicalDto();
+
+        ModelAndView mav = new ModelAndView("admin/periodicals/new-periodical");
+        mav.addObject("periodical", periodicalDto);
 
         return mav;
     }
 
+
     @PostMapping("/admin/periodicals/new")
-    public String savePeriodical(@RequestParam(value = "name") String name,
-                                 @RequestParam(value = "price") String price,
-                                 @RequestParam(value = "description") String description) {
+    public ModelAndView savePeriodical(@ModelAttribute("periodical") @Valid PeriodicalDto periodical,
+                                       BindingResult bindingResult) {
 
-        LOG.debug("Try to save new periodical: name={}, price={}, description={}", name, price, description);
+        LOG.debug("Try to save new periodical: {}", periodical);
+        ModelAndView modelAndView = new ModelAndView();
 
-        Periodical periodical = new Periodical(name, description, Long.parseLong(price));
-        periodicalService.save(periodical);
+        if (bindingResult.hasErrors()) {
+            modelAndView.setViewName("admin/periodicals/new-periodical");
+            return modelAndView;
+        }
 
-        return "redirect:/admin/periodicals";
+        Periodical periodicalToSave = new Periodical(
+            periodical.getName(),
+            periodical.getDescription(),
+            (long) periodical.getMonthlyPrice() * 100);
+
+        periodicalService.save(periodicalToSave);
+
+        return new ModelAndView("redirect:/admin/periodicals");
 
     }
 
     @GetMapping("admin/invoices")
     public ModelAndView listInvoices() {
         LOG.debug("Try to get in progress invoices");
+
         ModelAndView modelAndView = new ModelAndView("admin/invoice/list-invoices");
-
-        List<Invoice> invoices = invoiceService.getAllUnprocessedInvoices();
-
+        List<Invoice> invoices = invoiceService.getUnprocessedInvoices();
         modelAndView.addObject("invoices", invoices);
 
         return modelAndView;
     }
+
 
     @GetMapping("/admin/invoices/view")
     public ModelAndView viewInvoice(@RequestParam(value = "id") String id) {
@@ -90,18 +117,24 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView("admin/invoice/invoice");
 
         Invoice invoice = invoiceService.getById(Long.parseLong(id));
-        modelAndView.addObject("invoice", invoice);
 
-        Cart cart = invoiceService.getInvoiceCart(Long.parseLong(id));
-        modelAndView.addObject("cart", cart);
+        List<Periodical> periodicals = periodicalService.findAllByInvoiceId(invoice.getId());
+
+        Cart cart = new Cart();
+
+        for (Periodical periodical : periodicals) {
+            cart.addItem(periodical);
+        }
 
         User user = userService.findById(invoice.getUserId());
-        modelAndView.addObject("user", user);
 
-        LOG.info("Invoice: {}", invoice);
+        modelAndView.addObject("invoice", invoice);
+        modelAndView.addObject("cart", cart);
+        modelAndView.addObject("user", user);
 
         return modelAndView;
     }
+
 
     @PostMapping("/admin/invoices/view")
     public String processInvoice(@RequestParam(value = "command") String command,
@@ -128,7 +161,7 @@ public class AdminController {
     public ModelAndView updatePeriodicalView(@RequestParam("id") String id) {
         LOG.debug("Try to show edit periodicals form, periodical id={}", id);
 
-        ModelAndView modelAndView = new ModelAndView("admin/periodical/edit");
+        ModelAndView modelAndView = new ModelAndView("admin/periodicals/edit");
 
         Periodical periodical = periodicalService.getById(Long.parseLong(id));
 
@@ -148,6 +181,7 @@ public class AdminController {
 
     }
 
+
     @PostMapping("/admin/periodicals/edit")
     public ModelAndView updatePeriodical(@ModelAttribute("periodical") @Valid PeriodicalDto periodical,
                                          BindingResult bindingResult) {
@@ -155,7 +189,7 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView();
 
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("admin/periodical/edit");
+            modelAndView.setViewName("admin/periodicals/edit");
             return modelAndView;
         }
 
@@ -164,11 +198,11 @@ public class AdminController {
         periodicalToUpdate.setName(periodical.getName());
         periodicalToUpdate.setDescription(periodical.getDescription());
 
-        long price = new Float(periodical.getMonthlyPrice() * 100).longValue();
+        long price = (long) periodical.getMonthlyPrice() * 100;
         LOG.debug("Price: {}", price);
         periodicalToUpdate.setMonthlyPrice(price);
 
-        periodicalService.save(periodicalToUpdate);
+        periodicalService.update(periodicalToUpdate);
 
         return new ModelAndView("redirect:/admin/periodicals");
 
@@ -183,6 +217,5 @@ public class AdminController {
         return new ModelAndView("redirect:/admin/periodicals");
 
     }
-
 
 }

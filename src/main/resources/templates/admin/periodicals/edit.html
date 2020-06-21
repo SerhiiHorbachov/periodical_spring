@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en">
+
+<head th:replace="fragments/headTag :: headTag">
+</head>
+
+<body>
+
+<header th:replace="fragments/header :: header">
+</header>
+
+<div class="container">
+    <h3>Edit Periodical</h3>
+    <hr>
+
+    <form th:action="@{/admin/periodicals/edit}" method="POST" th:object="${periodical}"
+          class="needs-validation" novalidate>
+        <input type="hidden" name="id" th:value="${periodical.id}">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" class="form-control"
+                   th:attr="value=${periodical.name}" th:utext="#{msg.should_not_be_empty}" required>
+            <p class="text-danger" th:each="error: ${#fields.errors('name')}"
+               th:text="${error}">Validation error</p>
+        </div>
+
+        <div class="form-group">
+            <label for="monthlyPrice">Price, USD:</label>
+            <input type="number" min="0.00" max="10000.00" step="0.01" id="monthlyPrice" name="monthlyPrice"
+                   class="form-control" th:attr="value=${periodical.monthlyPrice}" required>
+            <p class="text-danger" th:utext="#{msg.should_not_be_empty}" th:each="error: ${#fields.errors('monthlyPrice')}"
+               th:text="${error}">Validation error</p>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description"
+                   th:attr="value=${periodical.description}" class="form-control">
+        </div>
+
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+
+    </form>
+
+</div>
+
+</div>
+
+<script>
+    var form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function (event) {
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+        }
+    })
+</script>
+
+</body>
+</html>

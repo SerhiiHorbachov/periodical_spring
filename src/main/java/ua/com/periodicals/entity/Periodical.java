@@ -1,6 +1,9 @@
 package ua.com.periodicals.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "periodicals")
@@ -16,6 +19,9 @@ public class Periodical {
 
     @Column(name = "monthly_price_cents")
     private long monthlyPrice;
+
+    @ManyToMany(mappedBy = "subscriptions")
+    Set<User> users = new HashSet<>();
 
     public Periodical() {
     }
@@ -63,6 +69,20 @@ public class Periodical {
 
     public void setMonthlyPrice(long monthlyPrice) {
         this.monthlyPrice = monthlyPrice;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Periodical that = (Periodical) o;
+        return id == that.id &&
+            Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 
     @Override

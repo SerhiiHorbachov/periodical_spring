@@ -15,40 +15,40 @@
     <form th:action="@{/register}" th:object="${user}" method="POST">
 
         <div class="alert alert-info" th:if="${emailExists}">
-            <p class="text text-center">
+            <p class="text text-center" th:text="#{msg.user_exist}">
                 user already exists
             </p>
         </div>
 
         <div class="form-group">
-            <label for="firstName" class="form-control-label">First Name</label>
+            <label for="firstName" class="form-control-label" th:text="#{label.first_name}">First Name</label>
             <input type="text" class="form-control" th:field="*{firstName}" id="firstName">
             <p class="text-danger" th:each="error: ${#fields.errors('firstName')}"
                th:text="${error}">Validation error</p>
         </div>
 
         <div class="form-group">
-            <label for="lastName" class="form-control-label">Last Name</label>
+            <label for="lastName" class="form-control-label" th:text="#{label.last_name}">Last Name</label>
             <input type="text" class="form-control" th:field="*{lastName}" id="lastName">
             <p class="text-danger" th:each="error : ${#fields.errors('lastName')}"
                th:text="${error}">Validation error</p>
         </div>
 
         <div class="form-group">
-            <label for="email" class="form-control-label">Email</label>
+            <label for="email" class="form-control-label" th:text="#{label.email}">Email</label>
             <input type="text" class="form-control" th:field="*{email}" id="email">
             <p class="text-danger" th:each="error : ${#fields.errors('email')}"
-               th:text="${error}">Validation error</p>
+               th:text="#{msg.should_not_be_empty}">Validation error</p>
         </div>
 
         <div class="form-group">
-            <label for="pwd" class="form-control-label">Password</label>
+            <label for="pwd" class="form-control-label" th:text="#{label.password}">Password</label>
             <input type="password" class="form-control" th:field="*{pwd}" id="pwd">
             <p class="text-danger" th:each="error : ${#fields.errors('pwd')}"
-               th:text="${error}">Validation error</p>
+               th:text="#{msg.pwd_validation}">Validation error</p>
         </div>
 
-        <input type="submit" value="Submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-success" th:text="#{label.register}"></button>
 
     </form>
 

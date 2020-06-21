@@ -1,36 +1,38 @@
 package ua.com.periodicals.service;
 
-import org.slf4j.Logger;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.periodicals.dao.InvoiceDao;
+import ua.com.periodicals.dao.PeriodicalDao;
+import ua.com.periodicals.dao.UserDao;
 import ua.com.periodicals.dto.UserDto;
 import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.entity.User;
-import ua.com.periodicals.entity.UserPeriodicals;
 import ua.com.periodicals.exception.DuplicateRecordException;
-import ua.com.periodicals.repository.UserPeriodicalsRepository;
-import ua.com.periodicals.repository.UserRepository;
 import ua.com.periodicals.security.UserPrincipal;
-
-import java.util.*;
 
 @Service
 public class UserService {
-    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserPeriodicalsRepository userPeriodicalsRepository;
+    private InvoiceDao invoiceDao;
 
+    @Autowired
+    private PeriodicalDao periodicalDao;
+
+    /*
     public List<User> getAllUsers() {
         List<User> users = userRepository.findAll();
         if (users.size() > 0) {
@@ -40,14 +42,16 @@ public class UserService {
         }
     }
 
+     */
+
     public User findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.get() == null) {
-            throw new NoSuchElementException(String.format("User with id=%d not found"));
-        } else {
-            return user.get();
-        }
+        return userDao.findById(id);
     }
+
+    public void update(User user) {
+        userDao.update(user);
+    }
+
 
     @Transactional
     public User register(UserDto userDto) {
@@ -65,48 +69,41 @@ public class UserService {
         userToSave.setPwd(passwordEncoder.encode(userDto.getPwd()));
         userToSave.setRole(User.Role.USER);
 
-        return userRepository.save(userToSave);
+        return userDao.save(userToSave);
     }
+
 
     public boolean isUserPresent(String email) {
         LOG.debug("Try to check if user present: {}", email);
-
-        User user = userRepository.findByEmail(email);
-
-        return user != null ? true : false;
-
+        return userDao.findByEmail(email).isPresent() ? true : false;
     }
 
     public boolean isUserSubscribedToPeriodical(long userId, long periodicalId) {
         LOG.info("Try to check if user is subscribed to periodicals, userId={}, periodicalId={}", userId, periodicalId);
-
-        UserPeriodicals userPeriodicals = userPeriodicalsRepository.findByUserIdAndAndPeriodicalId(userId, periodicalId);
-        LOG.info("UserPeriodicals: {}", userPeriodicals);
-
-        return userPeriodicals != null ? true : false;
+        return userDao.isUserSubscribedToPeriodical(userId, periodicalId);
     }
 
     public User getLoggedUser() {
-        LOG.info("Try to get logged user");
-
+        LOG.debug("Try to get logged user");
         UserPrincipal principal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findById(principal.getId()).orElseThrow(() -> new IllegalArgumentException("Not found"));
-
-        return user;
-
+        return userDao.findById(principal.getId());
     }
 
-    public Set<Periodical> getActiveSubscriptions() {
-        LOG.info("Try to get active subscriptions");
-
-        User user = getLoggedUser();
-        return user.getSubscriptions();
+    public boolean isPeriodicalInUnpaidInvoice(long userId, long periodicalId) {
+        return invoiceDao.isPeriodicalInUnpaidInvoice(userId, periodicalId);
     }
 
     @Transactional
-    public boolean unsubscribe(long userId, long periodicalId) {
+    public void unsubscribe(long periodicalId) {
         LOG.debug("Try to get delete subscription");
-        return userPeriodicalsRepository.deleteByUserIdAndAndPeriodicalId(userId, periodicalId) > 0;
+
+        Periodical periodical = periodicalDao.getById(periodicalId);
+        User user = getLoggedUser();
+
+        user.getSubscriptions().remove(periodical);
+
+        userDao.update(user);
+
     }
 
 }
