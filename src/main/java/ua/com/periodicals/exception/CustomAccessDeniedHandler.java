@@ -14,7 +14,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 
-
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
         httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/accessDenied");

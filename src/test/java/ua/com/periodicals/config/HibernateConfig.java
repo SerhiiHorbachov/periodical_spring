@@ -5,20 +5,26 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.annotation.Priority;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
 @TestConfiguration
-@ComponentScan({"ua.com.periodicals.dao", "ua.com.periodicals.entity"})
+@ComponentScan({"ua.com.periodicals.dao",
+    "ua.com.periodicals.entity",
+})
 public class HibernateConfig {
 
     private final ApplicationContext applicationContext;
@@ -75,5 +81,12 @@ public class HibernateConfig {
         return properties;
 
     }
+
+//    @Bean
+//    @Primary
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+
 
 }

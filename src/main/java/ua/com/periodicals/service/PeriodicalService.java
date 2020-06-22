@@ -10,7 +10,6 @@ import ua.com.periodicals.entity.Periodical;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -60,7 +59,6 @@ public class PeriodicalService {
         //check periodical in order_items
         // check periodicals is in users_periodicals;
 
-
         periodicalDao.deleteById(periodicalId);
     }
 
@@ -69,10 +67,8 @@ public class PeriodicalService {
         return periodicalDao.findAllByInvoiceId(invoiceId);
     }
 
-
     private void checkPeriodicalIsUsed(long id) {
 
     }
-
-
+    
 }

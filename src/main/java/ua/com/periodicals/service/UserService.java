@@ -32,18 +32,6 @@ public class UserService {
     @Autowired
     private PeriodicalDao periodicalDao;
 
-    /*
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        if (users.size() > 0) {
-            return users;
-        } else {
-            return new ArrayList<User>();
-        }
-    }
-
-     */
-
     public User findById(Long id) {
         return userDao.findById(id);
     }
@@ -51,7 +39,6 @@ public class UserService {
     public void update(User user) {
         userDao.update(user);
     }
-
 
     @Transactional
     public User register(UserDto userDto) {
@@ -71,7 +58,6 @@ public class UserService {
 
         return userDao.save(userToSave);
     }
-
 
     public boolean isUserPresent(String email) {
         LOG.debug("Try to check if user present: {}", email);
