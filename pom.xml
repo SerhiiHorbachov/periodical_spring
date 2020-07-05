@@ -111,6 +111,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.hibernate</groupId>-->
+<!--                    <artifactId>hibernate-validator</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
             <scope>test</scope>
 
         </dependency>
@@ -130,7 +136,6 @@
         </dependency>
 
     </dependencies>
-
 
 
     <build>

@@ -23,7 +23,7 @@ class OrderItemDaoImplTest {
     }
 
     @Test
-    void save_ShouldStoreOrderItemInDatabase(){
+    void save_ShouldStoreOrderItemInDatabase() {
         long invoiceId = 11;
         long periodicalId = 20;
         long costPerMonth = 1000;
@@ -36,5 +36,18 @@ class OrderItemDaoImplTest {
         assertEquals(expectedOrderItemId, storedItem.getId());
 
     }
+    
+    @Test
+    void isPeriodicalInOrderItems_ShouldReturnTrue_WhenPeriodicalIdInOrderItems() {
+        long periodicalId = 2;
+        assertTrue(orderItemDao.isPeriodicalInOrderItems(periodicalId));
 
+    }
+
+    @Test
+    void isPeriodicalInOrderItems_ShouldReturnFalse_WhenPeriodicalIdNotInOrderItems() {
+        long periodicalId = 20;
+        assertFalse(orderItemDao.isPeriodicalInOrderItems(periodicalId));
+
+    }
 }

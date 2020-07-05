@@ -81,12 +81,5 @@ public class HibernateConfig {
         return properties;
 
     }
-
-//    @Bean
-//    @Primary
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
-
+    
 }

@@ -21,6 +21,8 @@ import java.util.Optional;
 @Repository
 public class UserDaoImpl implements UserDao {
 
+    private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserDaoImpl.class);
+
     private final static String FIND_USER_BY_ID_TYPED_QUERY = "select u from User u where u.email=:email";
     private final static String FIND_SUBSCRIBED_PERIODICAL_QUERY =
         "SELECT\n" +
@@ -37,7 +39,14 @@ public class UserDaoImpl implements UserDao {
             "    user_id= :userId \n" +
             "    AND periodical_id= :periodicalId";
 
-    private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserDaoImpl.class);
+    private static final String FIND_USER_BY_ID_QUERY = "SELECT\n" +
+        "    u \n" +
+        "FROM\n" +
+        "    User u \n" +
+        "LEFT JOIN\n" +
+        "    FETCH u.subscriptions \n" +
+        "WHERE\n" +
+        "    u.id = :id";
 
     @Autowired
     SessionFactory sessionFactory;
@@ -49,18 +58,22 @@ public class UserDaoImpl implements UserDao {
         User user = null;
 
         try (Session session = sessionFactory.openSession()) {
-            TypedQuery<User> typedQuery = session.createQuery(FIND_USER_BY_ID_TYPED_QUERY, User.class);
-            typedQuery.setParameter("email", email);
+            try {
+                TypedQuery<User> typedQuery = session.createQuery(FIND_USER_BY_ID_TYPED_QUERY, User.class);
+                typedQuery.setParameter("email", email);
 
-            session.beginTransaction();
-            user = typedQuery.getSingleResult();
-            session.getTransaction().commit();
+                session.beginTransaction();
+                user = typedQuery.getSingleResult();
+                session.getTransaction().commit();
 
-        } catch (NoResultException e) {
-            LOG.warn("User with email {} is not present: ", email);
-        } catch (HibernateException e) {
-            LOG.error("Failed to find user by email: {}", email, e);
-            throw new DaoException("Error when finding user by email: " + email, e);
+            } catch (NoResultException e) {
+                LOG.warn("User with email {} is not present: ", email);
+                session.getTransaction().rollback();
+            } catch (HibernateException e) {
+                LOG.error("Failed to find user by email: {}", email, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Error when finding user by email: " + email, e);
+            }
         }
 
         return Optional.ofNullable(user);
@@ -71,26 +84,27 @@ public class UserDaoImpl implements UserDao {
     public User findById(long id) {
         LOG.debug("Try to find user by id={}", id);
 
-        User user;
-
         try (Session session = sessionFactory.openSession()) {
+            try {
+                session.beginTransaction();
 
-            session.beginTransaction();
+                Query query = session.createQuery(FIND_USER_BY_ID_QUERY);
+                query.setParameter("id", id);
 
-            Query query = session.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.subscriptions WHERE u.id = :id");
-            query.setParameter("id", id);
+                User user = (User) query.getSingleResult();
+                session.getTransaction().commit();
 
-            user = (User) query.getSingleResult();
-            session.getTransaction().commit();
+                return user;
 
-            return user;
-
-        } catch (NoResultException e) {
-            LOG.warn("User with id {} is not present.", id, e);
-            throw new NotFoundException(String.format("User with id=%d is not present.", id));
-        } catch (HibernateException e) {
-            LOG.error("Failed to find user by id={}", id, e);
-            throw new DaoException("Error when finding user by id=" + id, e);
+            } catch (NoResultException e) {
+                LOG.warn("User with id {} is not present.", id, e);
+                session.getTransaction().rollback();
+                throw new NotFoundException(String.format("User with id=%d is not present.", id));
+            } catch (HibernateException e) {
+                LOG.error("Failed to find user by id={}", id, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Error when finding user by id=" + id, e);
+            }
         }
 
     }
@@ -100,26 +114,30 @@ public class UserDaoImpl implements UserDao {
         LOG.debug("Try to check if user id={} is subscribed to periodical id={}", userId, periodicalId);
 
         try (Session session = sessionFactory.openSession()) {
+            try {
 
-            session.beginTransaction();
+                session.beginTransaction();
 
-            Query query = session.createSQLQuery(FIND_SUBSCRIBED_PERIODICAL_QUERY)
-                .setParameter("userId", userId)
-                .setParameter("periodicalId", periodicalId)
-                .addEntity(Periodical.class);
+                Query query = session.createSQLQuery(FIND_SUBSCRIBED_PERIODICAL_QUERY)
+                    .setParameter("userId", userId)
+                    .setParameter("periodicalId", periodicalId)
+                    .addEntity(Periodical.class);
 
-            query.getSingleResult();
+                query.getSingleResult();
+                session.getTransaction().commit();
 
-            session.getTransaction().commit();
-
-        } catch (NoResultException e) {
-            LOG.warn("User id={} is not subscribed to periodical id={}", userId, periodicalId, e);
-            return false;
-        } catch (HibernateException e) {
-            LOG.error("Failed to check if user id={} is subscribed to periodical id={}", userId, periodicalId, e);
-            throw new DaoException(String.format("Failed to check if user id=%d is subscribed to periodical id=%d", userId, periodicalId), e);
+                return true;
+            } catch (NoResultException e) {
+                LOG.warn("User id={} is not subscribed to periodical id={}", userId, periodicalId, e);
+                session.getTransaction().rollback();
+                return false;
+            } catch (HibernateException e) {
+                LOG.error("Failed to check if user id={} is subscribed to periodical id={}", userId, periodicalId, e);
+                session.getTransaction().rollback();
+                throw new DaoException(String.format("Failed to check if user id=%d is subscribed to periodical id=%d", userId, periodicalId), e);
+            }
         }
-        return true;
+
     }
 
     @Override
@@ -127,15 +145,17 @@ public class UserDaoImpl implements UserDao {
         LOG.debug("Try to update user: {}", user);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            session.update(user);
-            session.getTransaction().commit();
+            try {
+                session.beginTransaction();
+                session.update(user);
+                session.getTransaction().commit();
 
-        } catch (HibernateException e) {
-            LOG.error("Failed to update user: {}", user, e);
-            throw new DaoException("Failed to update user.", e);
+            } catch (HibernateException e) {
+                LOG.error("Failed to update user: {}", user, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Failed to update user.", e);
+            }
         }
-
 
     }
 
@@ -144,18 +164,21 @@ public class UserDaoImpl implements UserDao {
         LOG.debug("Try to save new user: {}", user);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            long id = (long) session.save(user);
+                long id = (long) session.save(user);
 
-            User storedUser = session.get(User.class, id);
+                User storedUser = session.get(User.class, id);
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return storedUser;
-        } catch (HibernateException e) {
-            LOG.error("Failed to save new user: {}", user, e);
-            throw new DaoException("Failed to save new user", e);
+                return storedUser;
+            } catch (HibernateException e) {
+                LOG.error("Failed to save new user: {}", user, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Failed to save new user", e);
+            }
         }
     }
 

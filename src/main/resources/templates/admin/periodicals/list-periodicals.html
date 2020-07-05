@@ -21,7 +21,13 @@
                 </p>
                 <div class="col-md-10">
                     <h2 th:case="null">No record found !!</h2>
+
                     <div th:case="*">
+
+                        <div class="alert alert-danger" th:if="${periodicalInUse}"><span
+                                th:text="#{msg.periodical_in_use}">Periodicals cannot be removed</span>
+                        </div>
+
                         <table class="table table-striped table-responsive-md">
                             <thead>
                             <tr>
@@ -48,6 +54,10 @@
                                 <td>
                                     <form th:action="@{/admin/periodicals/delete}" method="post">
                                         <input type="hidden" th:value="${periodical.id}" name="id">
+                                        <input type="hidden" name="currentPage"
+                                               th:value="${currentPage}">
+                                        <input type="hidden" name="totalPages"
+                                               th:value="${totalPages}">
                                         <input type="submit" class="btn btn-outline-danger"
                                                value="Delete">
                                     </form>

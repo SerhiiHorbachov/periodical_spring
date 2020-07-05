@@ -15,7 +15,6 @@ import ua.com.periodicals.exception.NotFoundException;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -43,25 +42,25 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     @Override
     public List<Periodical> findAll() {
-
         LOG.debug("Try to find all periodicals");
 
-        List<Periodical> periodicals = new ArrayList<>();
-
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            TypedQuery<Periodical> typedQuery = session
-                .createQuery(FIND_ALL_PERIODICALS_TYPED_QUERY, Periodical.class);
-            periodicals = typedQuery.getResultList();
+                TypedQuery<Periodical> typedQuery = session
+                    .createQuery(FIND_ALL_PERIODICALS_TYPED_QUERY, Periodical.class);
+                List<Periodical> periodicals = typedQuery.getResultList();
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return periodicals;
+                return periodicals;
 
-        } catch (HibernateException e) {
-            LOG.error("Failed to find all periodicals: ", e);
-            throw new DaoException("Error when getting all periodicals.", e);
+            } catch (HibernateException e) {
+                LOG.error("Failed to find all periodicals: ", e);
+                session.getTransaction().rollback();
+                throw new DaoException("Error when getting all periodicals.", e);
+            }
         }
 
     }
@@ -70,19 +69,22 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to find periodicals per page: firstResult={}, maxResult={}", firstResult, maxResults);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            Query query = session.createQuery("FROM Periodical p ORDER BY p.id");
-            query.setFirstResult(firstResult);
-            query.setMaxResults(maxResults);
-            List<Periodical> periodicals = query.getResultList();
+                Query query = session.createQuery("FROM Periodical p ORDER BY p.id");
+                query.setFirstResult(firstResult);
+                query.setMaxResults(maxResults);
+                List<Periodical> periodicals = query.getResultList();
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return periodicals;
-        } catch (HibernateException e) {
-            LOG.error("Failed to find all periodicals per page. FirstResult={}, maxResult={} ", firstResult, maxResults, e);
-            throw new DaoException(String.format("Error when getting periodicals per page, firstResult=%d, maxResult=%d", firstResult, maxResults), e);
+                return periodicals;
+            } catch (HibernateException e) {
+                LOG.error("Failed to find all periodicals per page. FirstResult={}, maxResult={} ", firstResult, maxResults, e);
+                session.getTransaction().rollback();
+                throw new DaoException(String.format("Error when getting periodicals per page, firstResult=%d, maxResult=%d", firstResult, maxResults), e);
+            }
         }
     }
 
@@ -92,18 +94,20 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to save new periodical: {}", periodical);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            long id = (long) session.save(periodical);
+                long id = (long) session.save(periodical);
 
-            Periodical storedPeriodical = session.get(Periodical.class, id);
+                Periodical storedPeriodical = session.get(Periodical.class, id);
+                session.getTransaction().commit();
 
-            session.getTransaction().commit();
-
-            return storedPeriodical;
-        } catch (HibernateException e) {
-            LOG.error("Failed to save new periodical: {}", periodical, e);
-            throw new DaoException("Failed to save new periodical", e);
+                return storedPeriodical;
+            } catch (HibernateException e) {
+                LOG.error("Failed to save new periodical: {}", periodical, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Failed to save new periodical", e);
+            }
         }
 
     }
@@ -112,25 +116,26 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
     public Periodical getById(long id) {
         LOG.debug("Try to find periodical by id={}", id);
 
-        Periodical periodical;
-
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            periodical = session.get(Periodical.class, id);
+                Periodical periodical = session.get(Periodical.class, id);
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            if (periodical != null) {
-                return periodical;
-            } else {
-                LOG.warn("Periodical id={} is not present. ", id);
-                throw new NotFoundException(String.format("Periodical id=%d is not present", id));
+                if (periodical != null) {
+                    return periodical;
+                } else {
+                    LOG.warn("Periodical id={} is not present. ", id);
+                    throw new NotFoundException(String.format("Periodical id=%d is not present", id));
+                }
+
+            } catch (HibernateException e) {
+                LOG.error("Failed to get periodical by id={}", id, e);
+                session.getTransaction().rollback();
+                throw new DaoException(String.format("Failed to get periodical by id=%d", id), e);
             }
-
-        } catch (HibernateException e) {
-            LOG.error("Failed to get periodical by id={}", id, e);
-            throw new DaoException(String.format("Failed to get periodical by id=%d", id), e);
         }
 
     }
@@ -141,17 +146,20 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to update periodical: {}", periodical);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            session.update(periodical);
-            Periodical updatedPeriodical = session.get(Periodical.class, periodical.getId());
+                session.update(periodical);
+                Periodical updatedPeriodical = session.get(Periodical.class, periodical.getId());
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return updatedPeriodical;
-        } catch (HibernateException e) {
-            LOG.error("Failed to update periodical: {}", periodical, e);
-            throw new DaoException("Failed to update periodical", e);
+                return updatedPeriodical;
+            } catch (HibernateException e) {
+                LOG.error("Failed to update periodical: {}", periodical, e);
+                session.getTransaction().rollback();
+                throw new DaoException("Failed to update periodical", e);
+            }
         }
     }
 
@@ -162,15 +170,18 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to delete periodical, id={}", id);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            Periodical periodical = session.get(Periodical.class, id);
-            session.remove(periodical);
+                Periodical periodical = session.get(Periodical.class, id);
+                session.remove(periodical);
 
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            LOG.error("Failed to delete periodical, id={}", id, e);
-            throw new DaoException(String.format("Failed to delete periodical, id=%d", id), e);
+                session.getTransaction().commit();
+            } catch (HibernateException e) {
+                LOG.error("Failed to delete periodical, id={}", id, e);
+                session.getTransaction().rollback();
+                throw new DaoException(String.format("Failed to delete periodical, id=%d", id), e);
+            }
         }
 
     }
@@ -180,17 +191,20 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to get count of periodicals.");
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            Query query = session.createQuery("select count(*) from Periodical");
-            Long size = (Long) query.getSingleResult();
+                Query query = session.createQuery("select count(*) from Periodical");
+                Long size = (Long) query.getSingleResult();
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return size;
-        } catch (HibernateException e) {
-            LOG.error("Failed to get count from periodicals", e);
-            throw new DaoException("Failed to get count from periodicals", e);
+                return size;
+            } catch (HibernateException e) {
+                LOG.error("Failed to get count from periodicals", e);
+                session.getTransaction().rollback();
+                throw new DaoException("Failed to get count from periodicals", e);
+            }
         }
 
     }
@@ -200,23 +214,28 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         LOG.debug("Try to get all periodicals by invoice id={}", id);
 
         try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+            try {
+                session.beginTransaction();
 
-            Query query = session
-                .createSQLQuery(FIND_ALL_PERIODICALS_BY_INVOICE_ID).
-                    setParameter("invoiceId", id)
-                .addEntity(Periodical.class);
+                Query query = session
+                    .createSQLQuery(FIND_ALL_PERIODICALS_BY_INVOICE_ID).
+                        setParameter("invoiceId", id)
+                    .addEntity(Periodical.class);
 
-            List<Periodical> periodicals = query.getResultList();
+                List<Periodical> periodicals = query.getResultList();
 
-            session.getTransaction().commit();
+                session.getTransaction().commit();
 
-            return periodicals;
+                return periodicals;
 
-        } catch (HibernateException e) {
-            LOG.error("Failed to get all periodicals by invoice id={}", id, e);
-            throw new DaoException(String.format("Failed to get all periodicals by invoice id=%d", id), e);
+            } catch (HibernateException e) {
+                LOG.error("Failed to get all periodicals by invoice id={}", id, e);
+                session.getTransaction().rollback();
+                throw new DaoException(String.format("Failed to get all periodicals by invoice id=%d", id), e);
+            }
         }
     }
+
+
 
 }

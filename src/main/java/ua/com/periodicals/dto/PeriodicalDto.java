@@ -1,6 +1,6 @@
 package ua.com.periodicals.dto;
 
-import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -9,7 +9,7 @@ public class PeriodicalDto {
     private long id;
 
     @NotNull
-    @NotEmpty
+    @NotBlank
     private String name;
 
     private String description;

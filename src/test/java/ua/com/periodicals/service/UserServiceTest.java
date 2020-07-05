@@ -3,13 +3,13 @@ package ua.com.periodicals.service;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ua.com.periodicals.config.AppSecurityConfig;
+import org.springframework.test.context.junit4.SpringRunner;
 import ua.com.periodicals.dao.InvoiceDao;
 import ua.com.periodicals.dao.PeriodicalDao;
 import ua.com.periodicals.dao.UserDao;
@@ -22,9 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    private static ApplicationContext applicationContext;
 
     @Mock
     UserDao userDao;
@@ -39,13 +40,8 @@ class UserServiceTest {
     PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private static UserService userService;
+    UserService userService;
 
-    @BeforeAll
-    public static void setUp() {
-        applicationContext = new AnnotationConfigApplicationContext(AppSecurityConfig.class);
-        userService = applicationContext.getBean(UserService.class);
-    }
 
     @Test
     void smokeTest() {

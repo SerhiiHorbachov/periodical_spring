@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.entity.User;
 import ua.com.periodicals.model.Cart;
+import ua.com.periodicals.security.MyUserDetailsService;
 import ua.com.periodicals.security.UserPrincipal;
 import ua.com.periodicals.service.InvoiceService;
 import ua.com.periodicals.service.PeriodicalService;
@@ -36,6 +37,9 @@ public class UserController {
 
     @Autowired
     InvoiceService invoiceService;
+
+    @Autowired
+    MyUserDetailsService myUserDetailsService;
 
     @Autowired
     Environment env;
@@ -65,12 +69,16 @@ public class UserController {
     }
 
     @PostMapping("/main")
-    public ModelAndView addToCart(@RequestParam(value = "id") String id, Model model) {
+    public ModelAndView addToCart(@RequestParam(value = "id") String id,
+                                  @RequestParam("currentPage") String currentPage,
+                                  @RequestParam("totalPages") String totalPages,
+                                  Model model) {
         LOG.debug("Try to add periodical to cart, id={}", id);
+        LOG.info("Request params... currentPage: {}, totalPages: {}", currentPage, totalPages);
 
         ModelAndView mav = new ModelAndView();
         Periodical periodical = periodicalService.getById(Long.parseLong(id));
-        User loggedUser = userService.getLoggedUser();
+        User loggedUser = myUserDetailsService.getLoggedUser();
 
         if (userService.isUserSubscribedToPeriodical(loggedUser.getId(), periodical.getId())
             || userService.isPeriodicalInUnpaidInvoice(loggedUser.getId(), periodical.getId())
@@ -78,7 +86,10 @@ public class UserController {
             mav.setViewName("user/main");
             mav.addObject("alreadySubscribed", "Already Subscribed");
 
-            List<Periodical> periodicals = periodicalService.getAllPeriodicals();
+            int itemsPerPage = Integer.parseInt(env.getProperty("admin_periodicals_per_page"));
+            List<Periodical> periodicals = periodicalService.getPeriodicalsPage(Integer.parseInt(currentPage), itemsPerPage);
+            mav.addObject("currentPage", Integer.parseInt(currentPage));
+            mav.addObject("totalPages", Integer.parseInt(totalPages));
             mav.addObject("periodicals", periodicals);
 
         } else {
@@ -146,7 +157,7 @@ public class UserController {
         LOG.debug("Try to show active subscriptions");
 
         ModelAndView modelAndView = new ModelAndView("user/subscriptions");
-        modelAndView.addObject("subscriptions", userService.getLoggedUser().getSubscriptions());
+        modelAndView.addObject("subscriptions", myUserDetailsService.getLoggedUser().getSubscriptions());
 
         return modelAndView;
     }
@@ -154,8 +165,9 @@ public class UserController {
     @PostMapping("/main/subscriptions")
     public String unsubscribe(@RequestParam("id") String periodicalId) {
         LOG.debug("Try to remove from subscriptions, periodicalId={}", periodicalId);
+        long userId = myUserDetailsService.getLoggedUser().getId();
 
-        userService.unsubscribe(Long.parseLong(periodicalId));
+        userService.unsubscribe(Long.parseLong(periodicalId), userId);
         return "redirect:/main/subscriptions";
     }
 

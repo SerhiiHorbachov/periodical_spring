@@ -3,7 +3,6 @@ package ua.com.periodicals.service;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +13,7 @@ import ua.com.periodicals.dto.UserDto;
 import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.entity.User;
 import ua.com.periodicals.exception.DuplicateRecordException;
-import ua.com.periodicals.security.UserPrincipal;
+import ua.com.periodicals.security.MyUserDetailsService;
 
 @Service
 public class UserService {
@@ -31,6 +30,9 @@ public class UserService {
 
     @Autowired
     private PeriodicalDao periodicalDao;
+
+    @Autowired
+    private MyUserDetailsService myUserDetailsService;
 
     public User findById(Long id) {
         return userDao.findById(id);
@@ -69,22 +71,16 @@ public class UserService {
         return userDao.isUserSubscribedToPeriodical(userId, periodicalId);
     }
 
-    public User getLoggedUser() {
-        LOG.debug("Try to get logged user");
-        UserPrincipal principal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userDao.findById(principal.getId());
-    }
-
     public boolean isPeriodicalInUnpaidInvoice(long userId, long periodicalId) {
         return invoiceDao.isPeriodicalInUnpaidInvoice(userId, periodicalId);
     }
 
     @Transactional
-    public void unsubscribe(long periodicalId) {
+    public void unsubscribe(long periodicalId, long userId) {
         LOG.debug("Try to get delete subscription");
 
         Periodical periodical = periodicalDao.getById(periodicalId);
-        User user = getLoggedUser();
+        User user = myUserDetailsService.getLoggedUser();
 
         user.getSubscriptions().remove(periodical);
 

@@ -3,11 +3,14 @@ package ua.com.periodicals.service;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.junit4.SpringRunner;
 import ua.com.periodicals.config.AppSecurityConfig;
 import ua.com.periodicals.dao.PeriodicalDao;
 import ua.com.periodicals.entity.Periodical;
@@ -18,10 +21,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class PeriodicalServiceTest {
 
-    private static ApplicationContext applicationContext;
 
     @Mock
     PeriodicalDao periodicalDao;
@@ -29,11 +33,6 @@ class PeriodicalServiceTest {
     @InjectMocks
     private static PeriodicalService periodicalService;
 
-    @BeforeAll
-    public static void setUp() {
-        applicationContext = new AnnotationConfigApplicationContext(AppSecurityConfig.class);
-        periodicalService = applicationContext.getBean(PeriodicalService.class);
-    }
 
     @Test
     void smokeTest() {

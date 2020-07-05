@@ -8,8 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.com.periodicals.config.AppSecurityConfig;
 import ua.com.periodicals.dao.InvoiceDao;
@@ -33,8 +35,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class InvoiceServiceTest {
 
-    private static ApplicationContext applicationContext;
-
     @Mock
     InvoiceDao invoiceDao;
 
@@ -48,13 +48,7 @@ class InvoiceServiceTest {
     PeriodicalService periodicalService;
 
     @InjectMocks
-    private static InvoiceService invoiceService;
-
-    @BeforeAll
-    public static void setUp() {
-        applicationContext = new AnnotationConfigApplicationContext(AppSecurityConfig.class);
-        invoiceService = applicationContext.getBean(InvoiceService.class);
-    }
+    InvoiceService invoiceService;
 
     @Test
     void smokeTest() {
