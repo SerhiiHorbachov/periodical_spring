@@ -79,7 +79,6 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -111,14 +110,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.hibernate</groupId>-->
-<!--                    <artifactId>hibernate-validator</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
             <scope>test</scope>
-
         </dependency>
 
         <dependency>

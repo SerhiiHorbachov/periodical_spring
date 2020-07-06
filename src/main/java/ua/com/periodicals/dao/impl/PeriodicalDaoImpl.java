@@ -17,6 +17,10 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Repository
 public class PeriodicalDaoImpl implements PeriodicalDao {
 
@@ -40,6 +44,11 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
     @Autowired
     SessionFactory sessionFactory;
 
+    /**
+     * Finds all stored periodicals
+     *
+     * @return List<Periodical>
+     */
     @Override
     public List<Periodical> findAll() {
         LOG.debug("Try to find all periodicals");
@@ -65,6 +74,14 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     }
 
+    /**
+     * Methods return specified quantity of Periodicals per page
+     *
+     * @param firstResult first periodicals that is definied by its position in database
+     * @param maxResults  total result that should be returned
+     * @return List<Periodical>
+     */
+    @Override
     public List<Periodical> findPerPage(int firstResult, int maxResults) {
         LOG.debug("Try to find periodicals per page: firstResult={}, maxResult={}", firstResult, maxResults);
 
@@ -88,6 +105,12 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         }
     }
 
+    /**
+     * Saves new periodical in database
+     *
+     * @param periodical
+     * @return Periodical entity with generated id
+     */
     @Override
     @Transactional
     public Periodical save(Periodical periodical) {
@@ -112,6 +135,12 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     }
 
+    /**
+     * Finds periodical by its id
+     *
+     * @param id periodicals id
+     * @return Periodical stored in database
+     */
     @Override
     public Periodical getById(long id) {
         LOG.debug("Try to find periodical by id={}", id);
@@ -140,6 +169,13 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     }
 
+
+    /**
+     * Updates Periodical stored in database
+     *
+     * @param periodical entity to be updated
+     * @return updated Periodical after it's been stored in database
+     */
     @Override
     @Transactional
     public Periodical update(Periodical periodical) {
@@ -163,6 +199,12 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
         }
     }
 
+
+    /**
+     * Deletes periodical from database by its id.
+     *
+     * @param id periodicals id.
+     */
     @Override
     @Transactional
     public void deleteById(long id) {
@@ -186,6 +228,11 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     }
 
+    /**
+     * Method return total quantity of Periodicals stored in database
+     *
+     * @return Long
+     */
     @Override
     public long getCount() {
         LOG.debug("Try to get count of periodicals.");
@@ -209,6 +256,12 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
 
     }
 
+    /**
+     * Method finds periodicals related to the specified Invoice
+     *
+     * @param id - invoice Id.
+     * @return -List<Periodical>
+     */
     @Override
     public List<Periodical> findAllByInvoiceId(long id) {
         LOG.debug("Try to get all periodicals by invoice id={}", id);
@@ -235,7 +288,5 @@ public class PeriodicalDaoImpl implements PeriodicalDao {
             }
         }
     }
-
-
 
 }

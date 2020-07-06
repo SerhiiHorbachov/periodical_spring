@@ -15,6 +15,10 @@ import ua.com.periodicals.entity.User;
 import ua.com.periodicals.exception.DuplicateRecordException;
 import ua.com.periodicals.security.MyUserDetailsService;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Service
 public class UserService {
     private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserService.class);
@@ -42,6 +46,12 @@ public class UserService {
         userDao.update(user);
     }
 
+    /**
+     * Method creates a new user in the database and encodes password.
+     *
+     * @param userDto
+     * @return registered user with generated Id.
+     */
     @Transactional
     public User register(UserDto userDto) {
         LOG.debug("Try to save user: {}", userDto);
@@ -61,20 +71,46 @@ public class UserService {
         return userDao.save(userToSave);
     }
 
+    /**
+     * Checks if user with the specified email is registered.
+     *
+     * @param email user email.
+     * @return boolean
+     */
     public boolean isUserPresent(String email) {
         LOG.debug("Try to check if user present: {}", email);
         return userDao.findByEmail(email).isPresent() ? true : false;
     }
 
+    /**
+     * Checks if User is subscribed to the specified Periodical
+     *
+     * @param userId       user id
+     * @param periodicalId periodical id
+     * @return boolean
+     */
     public boolean isUserSubscribedToPeriodical(long userId, long periodicalId) {
         LOG.info("Try to check if user is subscribed to periodicals, userId={}, periodicalId={}", userId, periodicalId);
         return userDao.isUserSubscribedToPeriodical(userId, periodicalId);
     }
 
+    /**
+     * Check whether Periodical is in Invoice with status IN_PROGRESS of the specified User.
+     *
+     * @param userId       user id.
+     * @param periodicalId periodicals id.
+     * @return boolean.
+     */
     public boolean isPeriodicalInUnpaidInvoice(long userId, long periodicalId) {
         return invoiceDao.isPeriodicalInUnpaidInvoice(userId, periodicalId);
     }
 
+    /**
+     * Removes periodical from User's subscriptions in database.
+     *
+     * @param periodicalId periodicals id.
+     * @param userId       user id.
+     */
     @Transactional
     public void unsubscribe(long periodicalId, long userId) {
         LOG.debug("Try to get delete subscription");

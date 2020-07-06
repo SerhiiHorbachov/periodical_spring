@@ -23,11 +23,26 @@ import ua.com.periodicals.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @SessionAttributes("cart")
 @Controller
 public class UserController {
-
     private static final Logger LOG = (Logger) LoggerFactory.getLogger(UserController.class);
+
+    private final static String PERIODICALS_ATTR = "periodicals";
+    private final static String CURRENT_PAGE_ATTR = "currentPage";
+    private final static String TOTAL_PAGES_ATTR = "totalPages";
+    private final static String SUBSCRIPTIONS = "subscriptions";
+
+    private final static String PERIODICALS_PER_PAGE_PROPERTY = "user_main_periodicals_per_page";
+
+    private final static String USER_MAIN_PAGE = "user/main";
+    private final static String USER_SUBSCRIPTIONS_PAGE = "user/subscriptions";
+
+    private final static String USER_SUBSCRIPTIONS_PATH = "/main/subscriptions";
 
     @Autowired
     UserService userService;
@@ -55,15 +70,15 @@ public class UserController {
         LOG.debug("Try to show list-periodicals view, page={}", page.orElse(null));
 
         int currentPage = page.isPresent() ? Integer.parseInt(page.get()) : 1;
-        int itemsPerPage = Integer.parseInt(env.getProperty("admin_periodicals_per_page"));
+        int itemsPerPage = Integer.parseInt(env.getProperty(PERIODICALS_PER_PAGE_PROPERTY));
         List<Periodical> periodicals = periodicalService.getPeriodicalsPage(currentPage, itemsPerPage);
         int totalPages = (int) Math.ceil((periodicalService.getCount() / itemsPerPage));
 
-        ModelAndView mav = new ModelAndView("user/main");
+        ModelAndView mav = new ModelAndView(USER_MAIN_PAGE);
 
-        mav.addObject("periodicals", periodicals);
-        mav.addObject("currentPage", currentPage);
-        mav.addObject("totalPages", totalPages);
+        mav.addObject(PERIODICALS_ATTR, periodicals);
+        mav.addObject(CURRENT_PAGE_ATTR, currentPage);
+        mav.addObject(TOTAL_PAGES_ATTR, totalPages);
 
         return mav;
     }
@@ -156,8 +171,8 @@ public class UserController {
     public ModelAndView showActiveSubscriptions() {
         LOG.debug("Try to show active subscriptions");
 
-        ModelAndView modelAndView = new ModelAndView("user/subscriptions");
-        modelAndView.addObject("subscriptions", myUserDetailsService.getLoggedUser().getSubscriptions());
+        ModelAndView modelAndView = new ModelAndView(USER_SUBSCRIPTIONS_PAGE);
+        modelAndView.addObject(SUBSCRIPTIONS, myUserDetailsService.getLoggedUser().getSubscriptions());
 
         return modelAndView;
     }
@@ -168,7 +183,7 @@ public class UserController {
         long userId = myUserDetailsService.getLoggedUser().getId();
 
         userService.unsubscribe(Long.parseLong(periodicalId), userId);
-        return "redirect:/main/subscriptions";
+        return "redirect:" + USER_SUBSCRIPTIONS_PATH;
     }
 
 }

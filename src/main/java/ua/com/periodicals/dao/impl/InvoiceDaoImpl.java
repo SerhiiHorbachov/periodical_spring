@@ -15,9 +15,12 @@ import ua.com.periodicals.exception.DaoException;
 import ua.com.periodicals.exception.NotFoundException;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Repository
 public class InvoiceDaoImpl implements InvoiceDao {
 
@@ -54,6 +57,12 @@ public class InvoiceDaoImpl implements InvoiceDao {
     @Autowired
     SessionFactory sessionFactory;
 
+    /**
+     * Saves invoice entity in the database.
+     *
+     * @param invoice Invoice Entity
+     * @return Saved Invoice with generated id.
+     */
     @Override
     public Invoice save(Invoice invoice) {
         LOG.debug("Try to save invoice: {}", invoice);
@@ -78,6 +87,12 @@ public class InvoiceDaoImpl implements InvoiceDao {
 
     }
 
+    /**
+     * Finds all invoice by status
+     *
+     * @param status Invoice.STATUS
+     * @return A List of Invoices with matching status
+     */
     @Override
     public List<Invoice> findAllByStatus(Invoice.STATUS status) {
         LOG.debug("Try to find all invoices by status: {}", status);
@@ -103,6 +118,12 @@ public class InvoiceDaoImpl implements InvoiceDao {
 
     }
 
+    /**
+     * Finds Invoice by its id.
+     *
+     * @param id invoice id
+     * @return Invoice
+     */
     @Override
     public Invoice getById(long id) {
         LOG.debug("Try to get invoice by id={}", id);
@@ -128,6 +149,12 @@ public class InvoiceDaoImpl implements InvoiceDao {
 
     }
 
+    /**
+     * Updates invoice in the database
+     *
+     * @param invoice
+     * @return void
+     */
     @Override
     public void update(Invoice invoice) {
         LOG.debug("Try to update invoice: {}", invoice);
@@ -146,6 +173,13 @@ public class InvoiceDaoImpl implements InvoiceDao {
 
     }
 
+    /**
+     * Checks if a periodical is currently in invoices with status IN_PROGRESS
+     *
+     * @param userId       user id
+     * @param periodicalId periodical id
+     * @return
+     */
     @Override
     public boolean isPeriodicalInUnpaidInvoice(long userId, long periodicalId) {
         LOG.debug("Try to check if periodical is in unpaid invoice: userId={}, periodicalId={}", userId, periodicalId);

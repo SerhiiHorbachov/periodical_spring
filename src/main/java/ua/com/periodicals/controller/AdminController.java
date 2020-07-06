@@ -26,6 +26,10 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Controller
 public class AdminController {
     private static final Logger LOG = (Logger) LoggerFactory.getLogger(AdminController.class);
@@ -156,7 +160,6 @@ public class AdminController {
 
         return modelAndView;
     }
-
 
     @PostMapping("/admin/invoices/view")
     public String processInvoice(@RequestParam(value = "command") String command,

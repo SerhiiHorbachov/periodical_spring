@@ -18,6 +18,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.Optional;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Repository
 public class UserDaoImpl implements UserDao {
 
@@ -51,6 +55,12 @@ public class UserDaoImpl implements UserDao {
     @Autowired
     SessionFactory sessionFactory;
 
+    /**
+     * Method finds User by email in the database
+     *
+     * @param email User email
+     * @return Optional<User>
+     */
     @Override
     public Optional<User> findByEmail(String email) {
         LOG.debug("Try to find user by email {}", email);
@@ -80,6 +90,12 @@ public class UserDaoImpl implements UserDao {
 
     }
 
+    /**
+     * Finds User by id
+     *
+     * @param id User id
+     * @return
+     */
     @Override
     public User findById(long id) {
         LOG.debug("Try to find user by id={}", id);
@@ -109,6 +125,13 @@ public class UserDaoImpl implements UserDao {
 
     }
 
+    /**
+     * Checks if User is subscribed to the specified periodical
+     *
+     * @param userId
+     * @param periodicalId
+     * @return boolean
+     */
     @Override
     public boolean isUserSubscribedToPeriodical(long userId, long periodicalId) {
         LOG.debug("Try to check if user id={} is subscribed to periodical id={}", userId, periodicalId);
@@ -140,6 +163,11 @@ public class UserDaoImpl implements UserDao {
 
     }
 
+    /**
+     * Updates User in the database
+     *
+     * @param user
+     */
     @Override
     public void update(User user) {
         LOG.debug("Try to update user: {}", user);
@@ -159,6 +187,12 @@ public class UserDaoImpl implements UserDao {
 
     }
 
+    /**
+     * Saves a new User in the database
+     *
+     * @param user
+     * @return saved User with generated id.
+     */
     @Override
     public User save(User user) {
         LOG.debug("Try to save new user: {}", user);

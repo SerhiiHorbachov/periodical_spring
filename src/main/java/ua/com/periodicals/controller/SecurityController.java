@@ -17,6 +17,10 @@ import ua.com.periodicals.service.UserService;
 
 import javax.validation.Valid;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Controller
 public class SecurityController {
 

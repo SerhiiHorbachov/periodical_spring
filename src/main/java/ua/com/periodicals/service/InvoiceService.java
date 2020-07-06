@@ -15,6 +15,10 @@ import ua.com.periodicals.model.Cart;
 
 import java.util.List;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Transactional
 @Service
 public class InvoiceService {
@@ -33,11 +37,23 @@ public class InvoiceService {
     @Autowired
     UserService userService;
 
+    /**
+     * Finds Invoices with status IN_PROGRESS
+     *
+     * @return List<Invoice>
+     */
     public List<Invoice> getUnprocessedInvoices() {
         LOG.debug("Try to get unprocessed invoices");
         return invoiceDao.findAllByStatus(Invoice.STATUS.IN_PROGRESS);
     }
 
+    /**
+     * Method stores new Invoice with status IN_PROGRESS in database
+     *
+     * @param userId user id
+     * @param cart   Cart that contains periodicals
+     * @return boolean
+     */
     @Transactional
     public boolean submitInvoice(long userId, Cart cart) {
         LOG.debug("Try to submit invoice, userId={}, cart = {}", userId, cart);
@@ -53,13 +69,20 @@ public class InvoiceService {
         return true;
     }
 
+    /**
+     * Method changes status of invoice to Completed in database.
+     * Periodical are assigned to the User that is related to the Invoice.
+     *
+     * @param invoiceId invoice id.
+     * @return boolean
+     */
     @Transactional
     public boolean approveInvoice(Long invoiceId) {
         LOG.debug("Try to approve invoice, id={}", invoiceId);
 
         Invoice invoice = invoiceDao.getById(invoiceId);
         User user = userService.findById(invoice.getUserId());
-        
+
         List<Periodical> invoicePeriodicals = periodicalService.findAllByInvoiceId(invoice.getId());
 
         for (Periodical periodical : invoicePeriodicals) {
@@ -74,6 +97,11 @@ public class InvoiceService {
         return true;
     }
 
+    /**
+     * Changes status of the Invoice to CANCELLED and stores changes in the database
+     *
+     * @param invoiceId
+     */
     @Transactional
     public void cancelInvoice(Long invoiceId) {
         LOG.debug("Try to cancel invoice, id={}", invoiceId);
@@ -83,6 +111,12 @@ public class InvoiceService {
         invoiceDao.update(invoice);
     }
 
+    /**
+     * Retrieves Invoice from database
+     *
+     * @param id Invoice id
+     * @return Invoice
+     */
     public Invoice getById(long id) {
         LOG.debug("Try to get invoice by id={} ");
         Invoice invoice = invoiceDao.getById(id);

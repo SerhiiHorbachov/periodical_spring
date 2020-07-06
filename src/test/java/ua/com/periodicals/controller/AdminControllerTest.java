@@ -62,7 +62,6 @@ class AdminControllerTest {
     private final static String ADMIN_PERIODICALS_PATH = "/admin/periodicals";
     private final static String ADMIN_INVOICES_VIEW_PATH = "/admin/invoices/view";
 
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -183,7 +182,6 @@ class AdminControllerTest {
         mockMvc.perform(post("/admin/invoices/view")
             .param("command", APPROVE_CMD)
             .param("id", String.valueOf(invoiceId))
-
         ).andExpect(redirectedUrl(ADMIN_INVOICES_VIEW_PATH + "?id=" + invoiceId));
 
     }
@@ -197,7 +195,6 @@ class AdminControllerTest {
         mockMvc.perform(post("/admin/invoices/view")
             .param("command", CANCEL_CMD)
             .param("id", String.valueOf(invoiceId))
-
         ).andExpect(redirectedUrl(ADMIN_INVOICES_VIEW_PATH + "?id=" + invoiceId));
 
     }
@@ -290,6 +287,5 @@ class AdminControllerTest {
                 PERIODICAL_IN_USE_ATTR)
             );
     }
-
 
 }
