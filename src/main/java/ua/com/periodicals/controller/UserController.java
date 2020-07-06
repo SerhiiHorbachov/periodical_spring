@@ -23,6 +23,10 @@ import ua.com.periodicals.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @SessionAttributes("cart")
 @Controller
 public class UserController {
@@ -39,7 +43,7 @@ public class UserController {
     private final static String USER_SUBSCRIPTIONS_PAGE = "user/subscriptions";
 
     private final static String USER_SUBSCRIPTIONS_PATH = "/main/subscriptions";
-    
+
     @Autowired
     UserService userService;
 
