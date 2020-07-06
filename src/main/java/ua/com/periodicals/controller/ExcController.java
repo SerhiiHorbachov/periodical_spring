@@ -1,4 +1,4 @@
-package ua.com.periodicals.exception;
+package ua.com.periodicals.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

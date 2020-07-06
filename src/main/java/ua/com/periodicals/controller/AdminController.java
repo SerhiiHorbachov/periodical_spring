@@ -64,6 +64,11 @@ public class AdminController {
     @Autowired
     UserService userService;
 
+
+    /**
+     * @param page
+     * @return
+     */
     @GetMapping("/admin/periodicals")
     public ModelAndView getPeriodicalsPerPage(@RequestParam("page") Optional<String> page) {
         LOG.debug("Try to show list-periodicals view, page={}", page.orElse(null));
@@ -86,6 +91,9 @@ public class AdminController {
         return mav;
     }
 
+    /**
+     * @return
+     */
     @GetMapping("/admin/periodicals/new")
     public ModelAndView showNewPeriodicalForm() {
         LOG.debug("Try to show add periodical form");
@@ -98,6 +106,11 @@ public class AdminController {
         return mav;
     }
 
+    /**
+     * @param periodical
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("/admin/periodicals/new")
     public ModelAndView savePeriodical(@ModelAttribute(PERIODICAL_ATTR) @Valid PeriodicalDto periodical,
                                        BindingResult bindingResult) {
@@ -121,6 +134,9 @@ public class AdminController {
 
     }
 
+    /**
+     * @return
+     */
     @GetMapping("/admin/invoices")
     public ModelAndView listUnprocessedInvoices() {
         LOG.debug("Try to get in progress invoices");
@@ -132,6 +148,10 @@ public class AdminController {
         return modelAndView;
     }
 
+    /**
+     * @param id
+     * @return
+     */
     @GetMapping("/admin/invoices/view")
     public ModelAndView viewInvoice(@RequestParam(value = "id") String id) {
         LOG.debug("Try to show invoice id={}", id);
@@ -157,7 +177,11 @@ public class AdminController {
         return modelAndView;
     }
 
-
+    /**
+     * @param command
+     * @param invoiceId
+     * @return
+     */
     @PostMapping("/admin/invoices/view")
     public String processInvoice(@RequestParam(value = "command") String command,
                                  @RequestParam(value = "id") String invoiceId
@@ -178,6 +202,10 @@ public class AdminController {
         return "redirect:" + ADMIN_INVOICES_VIEW_PATH + "?id=" + invoiceId;
     }
 
+    /**
+     * @param id
+     * @return
+     */
     @GetMapping("/admin/periodicals/edit")
     public ModelAndView updatePeriodicalView(@RequestParam("id") String id) {
         LOG.debug("Try to show edit periodicals form, periodical id={}", id);
@@ -201,6 +229,11 @@ public class AdminController {
         return modelAndView;
     }
 
+    /**
+     * @param periodical
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("/admin/periodicals/edit")
     public ModelAndView updatePeriodical(@ModelAttribute("periodical") @Valid PeriodicalDto periodical,
                                          BindingResult bindingResult) {
@@ -226,6 +259,13 @@ public class AdminController {
 
     }
 
+    /**
+     * @param id
+     * @param currentPage
+     * @param totalPages
+     * @param model
+     * @return
+     */
     @PostMapping("/admin/periodicals/delete")
     public ModelAndView deletePeriodical(@RequestParam("id") String id,
                                          @RequestParam("currentPage") String currentPage,

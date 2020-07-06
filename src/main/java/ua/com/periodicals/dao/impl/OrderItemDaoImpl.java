@@ -3,20 +3,21 @@ package ua.com.periodicals.dao.impl;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.periodicals.dao.OrderItemDao;
-import ua.com.periodicals.entity.Invoice;
 import ua.com.periodicals.entity.OrderItem;
-import ua.com.periodicals.entity.Periodical;
 import ua.com.periodicals.exception.DaoException;
 
 import java.util.List;
 
+/**
+ * @author Serhii Hor
+ * @since 2020-06
+ */
 @Repository
 @Transactional
 public class OrderItemDaoImpl implements OrderItemDao {
@@ -33,6 +34,13 @@ public class OrderItemDaoImpl implements OrderItemDao {
     @Autowired
     SessionFactory sessionFactory;
 
+
+    /**
+     * Saves OrderItem In
+     *
+     * @param item
+     * @return stored OrderItem with generated ID.
+     */
     @Override
     public OrderItem save(OrderItem item) {
         LOG.debug("Try to save orderItem: {}", item);
@@ -57,6 +65,12 @@ public class OrderItemDaoImpl implements OrderItemDao {
 
     }
 
+    /**
+     * Method checks if Periodical exists in order items
+     *
+     * @param periodicalId
+     * @return boolean
+     */
     @Override
     public boolean isPeriodicalInOrderItems(long periodicalId) {
 

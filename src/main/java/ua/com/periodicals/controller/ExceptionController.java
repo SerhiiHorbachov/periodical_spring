@@ -1,4 +1,4 @@
-package ua.com.periodicals.exception;
+package ua.com.periodicals.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
