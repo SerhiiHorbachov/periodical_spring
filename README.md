@@ -9,11 +9,11 @@ The system calculates the payment and registers Invoice.
 Serhii Horbachov
 
 ## Technologies
-Java 11
-PostgreSQL 
-Springboot 
-Hibernate
-Thymeleaf
+- Java 11
+- PostgreSQL 
+- Springboot 
+- Hibernate
+- Thymeleaf
 
 ## Installation Instructions
 1. Project is implemented using Java 11. Install if required.  
