@@ -47,9 +47,9 @@ VALUES (DEFAULT, 'Jack', 'Nicholson', 'ADMIN', 'jack.nich@gmai.com', '1'),
        (DEFAULT, 'Robert', 'DeNiro', 'USER', 'rob.niro@gmai.com', '3'),
        (DEFAULT, 'Dustin', 'Hoffman', 'USER', 'dust.hoff@gmai.com', '4'),
        (DEFAULT, 'Al', 'Pacino', 'ADMIN', 'al.pach@gmai.com', '5'),
-       (DEFAULT, 'Admin', 'Adm', 'ADMIN', 'admin.@mail.com',
+       (DEFAULT, 'Admin', 'Adm', 'ADMIN', 'admin@mail.com',
         '$2y$10$5sF3fvgXPfxUNuYGcaGA3ekg//4qKiqIg1QBLGlDUpL8.gx7N5dKG'),
-       (DEFAULT, 'John', 'Smith', 'USER', 'user.@mail.com',
+       (DEFAULT, 'John', 'Smith', 'USER', 'user@mail.com',
         '$2y$10$5sF3fvgXPfxUNuYGcaGA3ekg//4qKiqIg1QBLGlDUpL8.gx7N5dKG');
 
 INSERT INTO periodicals(name, description, monthly_price_cents)
